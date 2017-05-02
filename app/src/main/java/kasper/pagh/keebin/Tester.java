@@ -18,7 +18,7 @@ import dk.danskebank.mobilepay.sdk.ResultCallback;
 import dk.danskebank.mobilepay.sdk.model.FailureResult;
 import dk.danskebank.mobilepay.sdk.model.Payment;
 import dk.danskebank.mobilepay.sdk.model.SuccessResult;
-import rest.houseKeeping.GetCertificate;
+import java.util.UUID;
 
 public class Tester extends AppCompatActivity implements AsyncResponse
 {
@@ -38,7 +38,10 @@ public class Tester extends AppCompatActivity implements AsyncResponse
         setContentView(R.layout.activity_tester);
         resp = (TextView) findViewById(R.id.mbTester);
         resp.setText("ikke startet");
+        MobilePay.getInstance().init("APPDK0000000000", Country.DENMARK);
+
         initMP();
+        Log.d("TESTER", MobilePay.getInstance().getCaptureType().toString() + " and has payment active? " + MobilePay.getInstance().hasActivePayment());
 
 
     }
@@ -50,10 +53,9 @@ public class Tester extends AppCompatActivity implements AsyncResponse
         if (isMobilePayInstalled)
         {
             Payment payment = new Payment();
-
             payment.setProductPrice(new BigDecimal(10.0));
-            payment.setOrderId("tissueZone");
-
+            payment.setOrderId(UUID.randomUUID().toString());
+            payment.setServerCallbackUrl("https://keebin-keebin.rhcloud.com/appswitchstatus");
             Intent paymentIntent = MobilePay.getInstance().createPaymentIntent(payment);
             startActivityForResult(paymentIntent, MOBILEPAY_PAYMENT_REQUEST_CODE);
         }
@@ -66,19 +68,35 @@ public class Tester extends AppCompatActivity implements AsyncResponse
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    public void onActivityResult(int requestCode, final int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
+        Bundle bundle = data.getExtras();
+        if (bundle != null)
+        {
+            for (String key : bundle.keySet())
+            {
+                Object value = bundle.get(key);
+                Log.d("TESTER INTENT", String.format("%s %s (%s)", key,
+                        value.toString(), value.getClass().getName()));
+            }
+        }
+
         if (requestCode == MOBILEPAY_PAYMENT_REQUEST_CODE)
         {
             // The request code matches our MobilePay Intent
             MobilePay.getInstance().handleResult(resultCode, data, new ResultCallback()
             {
+                final
+
                 @Override
                 public void onSuccess(SuccessResult result)
                 {
                     // The payment succeeded - you can deliver the product.
-                    resp.setText("NO FAIL");
+                    resp.setText("Amount withdrawn: " + result.getAmountWithdrawnFromCard() + "\n" +
+                            "Order ID: " + result.getOrderId() + "\n" +
+                            "Signature: " + result.getSignature().substring(0,10)+ "..." + "\n" +
+                            "Transaction ID: " + result.getTransactionId());
                 }
 
                 @Override
@@ -91,7 +109,7 @@ public class Tester extends AppCompatActivity implements AsyncResponse
                 @Override
                 public void onCancel()
                 {
-                    Toast.makeText(ctx, "CANCE", Toast.LENGTH_LONG);
+                    Toast.makeText(ctx, "CANCEL", Toast.LENGTH_LONG);
                     // The payment was cancelled.
                 }
             });
@@ -101,8 +119,9 @@ public class Tester extends AppCompatActivity implements AsyncResponse
 
     public void initMP()
     {
-        MobilePay.getInstance().init("APPDK0000000000", Country.DENMARK);
+
         MobilePay.getInstance().setCaptureType(CaptureType.RESERVE);
+
 
     }
 
