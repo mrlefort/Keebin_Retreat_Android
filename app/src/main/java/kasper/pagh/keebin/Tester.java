@@ -18,7 +18,7 @@ import dk.danskebank.mobilepay.sdk.ResultCallback;
 import dk.danskebank.mobilepay.sdk.model.FailureResult;
 import dk.danskebank.mobilepay.sdk.model.Payment;
 import dk.danskebank.mobilepay.sdk.model.SuccessResult;
-import java.util.UUID;
+import rest.houseKeeping.GetCertificate;
 
 public class Tester extends AppCompatActivity implements AsyncResponse
 {
@@ -29,6 +29,7 @@ public class Tester extends AppCompatActivity implements AsyncResponse
     int MOBILEPAY_PAYMENT_REQUEST_CODE = 1337;
 
     TextView resp;
+    TextView link;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -37,11 +38,10 @@ public class Tester extends AppCompatActivity implements AsyncResponse
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tester);
         resp = (TextView) findViewById(R.id.mbTester);
+        link = (TextView) findViewById(R.id.mbTesterLink);
         resp.setText("ikke startet");
-        MobilePay.getInstance().init("APPDK0000000000", Country.DENMARK);
-
+        link.setVisibility(View.INVISIBLE);
         initMP();
-        Log.d("TESTER", MobilePay.getInstance().getCaptureType().toString() + " and has payment active? " + MobilePay.getInstance().hasActivePayment());
 
 
     }
@@ -53,9 +53,10 @@ public class Tester extends AppCompatActivity implements AsyncResponse
         if (isMobilePayInstalled)
         {
             Payment payment = new Payment();
+
             payment.setProductPrice(new BigDecimal(10.0));
-            payment.setOrderId(UUID.randomUUID().toString());
-            payment.setServerCallbackUrl("https://keebin-keebin.rhcloud.com/appswitchstatus");
+            payment.setOrderId("tissueZone");
+
             Intent paymentIntent = MobilePay.getInstance().createPaymentIntent(payment);
             startActivityForResult(paymentIntent, MOBILEPAY_PAYMENT_REQUEST_CODE);
         }
@@ -71,45 +72,79 @@ public class Tester extends AppCompatActivity implements AsyncResponse
     public void onActivityResult(int requestCode, final int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        Bundle bundle = data.getExtras();
-        if (bundle != null)
-        {
-            for (String key : bundle.keySet())
-            {
-                Object value = bundle.get(key);
-                Log.d("TESTER INTENT", String.format("%s %s (%s)", key,
-                        value.toString(), value.getClass().getName()));
-            }
-        }
-
         if (requestCode == MOBILEPAY_PAYMENT_REQUEST_CODE)
         {
             // The request code matches our MobilePay Intent
             MobilePay.getInstance().handleResult(resultCode, data, new ResultCallback()
             {
-                final
-
                 @Override
                 public void onSuccess(SuccessResult result)
                 {
                     // The payment succeeded - you can deliver the product.
-                    resp.setText("Amount withdrawn: " + result.getAmountWithdrawnFromCard() + "\n" +
-                            "Order ID: " + result.getOrderId() + "\n" +
-                            "Signature: " + result.getSignature().substring(0,10)+ "..." + "\n" +
-                            "Transaction ID: " + result.getTransactionId());
+                    resp.setText(result + "");
                 }
 
                 @Override
                 public void onFailure(FailureResult result)
                 {
-                    // The payment failed - show an appropriate error message to the user. Consult the MobilePay class documentation for possible error codes.
-                    resp.setText("FAIL");
+                    link.setVisibility(View.INVISIBLE);
+                    switch (result.getErrorCode())
+                    {
+                        case 1:
+                            resp.setText("Something went wrong. Please try updating your app.");
+                            break;
+                        case 2:
+                            resp.setText("Could not connect, please check ur internet connection.");
+                            break;
+                        case 3:
+                            resp.setText("Your MobilePay is out of date, plz use the link to update it.");
+                            link.setVisibility(View.VISIBLE);
+                            link.setText(R.string.mobilepayGoogle);
+                            break;
+                        case 4:
+                            resp.setText("Something went wrong. Please try updating your app using the link below.");
+                            link.setVisibility(View.VISIBLE);
+                            link.setText(R.string.keebinGooglePlay);
+                            break;
+                        case 5:
+                            resp.setText("Something went wrong. Please try updating your app using the link below.");
+                            link.setVisibility(View.VISIBLE);
+                            link.setText(R.string.keebinGooglePlay);
+                            break;
+                        case 6:
+                            resp.setText("Your payment has times out, please try again.");
+                            break;
+                        case 7:
+                            resp.setText("You have exeeded your pay limit, you can view your limits under 'beløbsgrænser' on MobilePay app");
+                            break;
+                        case 8:
+                            resp.setText("Your payment has timed out, please try again.");
+                            break;
+                        case 9:
+                            resp.setText("Something went wrong try again later.");
+                            break;
+                        case 10:
+                            resp.setText("Your app is out of date, please update using link below");
+                            link.setVisibility(View.VISIBLE);
+                            link.setText(R.string.keebinGooglePlay);
+                            break;
+                        case 11:
+                            resp.setText("Order has already been sent, check for confirmation or try again later.");
+                            break;
+                        case 12:
+                            resp.setText("Your payment have been rejectred due to suspicious behaviour. Please contact MobilePay to resolve the issue.");
+                            break;
+                        default:
+                            resp.setText("something went wrong. Please try again later.");
+                            break;
+                    }
+
                 }
 
                 @Override
                 public void onCancel()
                 {
-                    Toast.makeText(ctx, "CANCEL", Toast.LENGTH_LONG);
+                    resp.setText("Your payment has been canceled, but you can keep shopping.");
                     // The payment was cancelled.
                 }
             });
@@ -119,10 +154,9 @@ public class Tester extends AppCompatActivity implements AsyncResponse
 
     public void initMP()
     {
-
+        MobilePay.getInstance().init("APPDK0000000000", Country.DENMARK);
         MobilePay.getInstance().setCaptureType(CaptureType.RESERVE);
-
-
+        MobilePay.getInstance().setTimeoutSeconds(4);
     }
 
     @Override

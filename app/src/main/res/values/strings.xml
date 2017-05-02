@@ -6,6 +6,8 @@
     <string name="putUserUrl">users/user/</string>
 
     <string name="hjemmeside">http://keebin.wixsite.com/keebin</string>
+    <string name="mobilepayGoogle">"market://details?id=dk.danskebank.mobilepay</string>
+    <string name="keebinGooglePlay">"market://details?id=kasper.pagh.keebin</string>
 
     <string name="deleteUserUrl">users/user/</string>
 

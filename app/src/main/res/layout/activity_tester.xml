@@ -21,6 +21,14 @@
         android:layout_marginStart="29dp"
         android:layout_marginTop="23dp"
         android:text="TextView"/>
+    <TextView
+        android:id="@+id/mbTesterLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mbTester"
+        android:layout_marginStart="29dp"
+        android:layout_marginTop="23dp"
+        android:text="@string/mobilepayGoogle"/>
 
     <Button
         android:id="@+id/mbButton"
