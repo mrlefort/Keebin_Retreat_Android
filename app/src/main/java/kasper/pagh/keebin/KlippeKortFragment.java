@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ public class KlippeKortFragment extends Fragment implements AsyncResponse {
     List<UserPrepaid> klippekort;
     private Gson gson = new Gson();
     KlippekortsArrayAdapter adapter;
+    Button købKnap;
     private TextView errorText;
     private KlippekortMellemLed mellemled;
 
@@ -44,6 +46,7 @@ public class KlippeKortFragment extends Fragment implements AsyncResponse {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         int d = MainActivity.currentUser.getId();
+
         String url = getResources().getString(R.string.baseUrl);
         mellemled = new KlippekortMellemLed(url,getContext());
 
@@ -54,8 +57,10 @@ public class KlippeKortFragment extends Fragment implements AsyncResponse {
         GetKlippekortByUserID g = new GetKlippekortByUserID(url,d,this,getActivity());
         g.execute();
         final View view = inflater.inflate(R.layout.users_loyalty_cards, container, false);
-
-        ListView listview = (ListView) view.findViewById(R.id.listOfUsersLoyaltyCards);
+        købKnap = (Button) view.findViewById(R.id.købKlip);
+        // HER KOMMER LISTENER TIL KØB KLIPPEKORT SIDE NÅR DEN ER LAVET!!!!!!
+        købKnap.setVisibility(View.INVISIBLE);
+                ListView listview = (ListView) view.findViewById(R.id.listOfUsersLoyaltyCards);
         adapter = new KlippekortsArrayAdapter(getActivity(), klippekort, mellemled.getCardVariations());
         listview.setAdapter(adapter);
         return view;
@@ -74,7 +79,7 @@ public class KlippeKortFragment extends Fragment implements AsyncResponse {
         } else
         {
             if(output.isEmpty()){
-                errorText.setText("Du har ikke nogen Klippekort");
+                købKnap.setVisibility(View.VISIBLE);
             }
             DatabaseHandler dbh = new DatabaseHandler(getContext());
             Log.d("her er card", output);

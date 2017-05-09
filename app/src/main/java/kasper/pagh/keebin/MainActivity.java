@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse, Co
         showLoadingDialog();
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fabShare = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setVisibility(View.INVISIBLE);
         fab.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v)
@@ -207,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse, Co
             }
         }
         button.setEnabled(true);
-        fab.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.INVISIBLE);
 
     }
 
@@ -247,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse, Co
         ImageButton button = (ImageButton) findViewById(R.id.loyaltycards_menu);
         buttons.add(button);
         button.setEnabled(false);
-        getSupportFragmentManager().beginTransaction().addToBackStack("").replace(R.id.fragment, SwipeFunction.newInstance()).commit();
+        getSupportFragmentManager().beginTransaction().addToBackStack("").replace(R.id.fragment, KlippeKortFragment.newInstance()).commit();
         firstMenuClickHasHappened = true;
         for (ImageButton btn : buttons)
         {
@@ -265,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse, Co
             }
         }
         button.setEnabled(true);
-        fab.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.INVISIBLE);
 
     }
 
@@ -306,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse, Co
                             }
                             YourInfo();
                             return true;
-                        case R.id.settings2:
+                        /*case R.id.settings2:
                             for (ImageButton btn : buttons)
                             {
                                 switch (btn.getId())
@@ -322,8 +323,8 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse, Co
                                         break;
                                 }
                             }
-                            KeebinInfo();
-                            return true;
+                            //KeebinInfo();
+                            return true;*/
                         case R.id.Setting3:
                             for (ImageButton btn : buttons)
                             {
@@ -488,7 +489,7 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse, Co
 
     public static void callFloatingActionButton()
     {
-        fabShare.setVisibility(View.VISIBLE);
+        fabShare.setVisibility(View.INVISIBLE);
     }
 
 

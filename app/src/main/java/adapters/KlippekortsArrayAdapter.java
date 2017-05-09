@@ -50,8 +50,6 @@ public class KlippekortsArrayAdapter extends ArrayAdapter<UserPrepaid> {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         View viewRow = inflater.inflate(R.layout.prepaid_card_layout, parent, false);
 
-        viewLogo = (ImageView) viewRow.findViewById(R.id.logo2);
-
         for (PrePaidCard card : variation) {
             Integer i = card.getId();
             if (i.equals(klippekort.get(position).getPrePaidCoffeeCardId()))
@@ -66,8 +64,8 @@ public class KlippekortsArrayAdapter extends ArrayAdapter<UserPrepaid> {
 
 
             int count = klippekort.get(position).getUsesleft();
-            int kopKaffe = context.getResources().getIdentifier("ikkebrugt", "drawable", "kasper.pagh.keebin");
-            int brugt = context.getResources().getIdentifier("brugtklip", "drawable", "kasper.pagh.keebin");
+            int kopKaffe = context.getResources().getIdentifier("hvid_kop", "drawable", "kasper.pagh.keebin");
+            int brugt = context.getResources().getIdentifier("sort_kop", "drawable", "kasper.pagh.keebin");
 
 
             ImageView viewBean1 = (ImageView) viewRow.findViewById(R.id.kaffe1);
@@ -80,15 +78,10 @@ public class KlippekortsArrayAdapter extends ArrayAdapter<UserPrepaid> {
             ImageView viewBean8 = (ImageView) viewRow.findViewById(R.id.kaffe8);
             ImageView viewBean9 = (ImageView) viewRow.findViewById(R.id.kaffe9);
             ImageView viewBean10 = (ImageView) viewRow.findViewById(R.id.kaffe10);
-            TextView antalGratis = (TextView) viewRow.findViewById(R.id.gratisKopper2);
-            TextView cardName = (TextView) viewRow.findViewById(R.id.klippekortName);
-            int coffeesAbove10 = count - 10;
+          int coffeesAbove10 = count - 10;
 
 
-            if (coffeesAbove10 > 0)
-            {
-                antalGratis.setText("X " + coffeesAbove10);
-            }
+
 
             ArrayList<ImageView> beanViews = new ArrayList<ImageView>();
             beanViews.add(viewBean1);
@@ -113,11 +106,12 @@ public class KlippekortsArrayAdapter extends ArrayAdapter<UserPrepaid> {
                 i++;
             }
 
-            viewRow.setOnClickListener(new View.OnClickListener() {
+            /*viewRow.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
 
-                     ((FragmentActivity)context).getSupportFragmentManager().beginTransaction().addToBackStack("").replace(R.id.fragment, SelectedKlippekortFragment.newInstance(klippekort.get(position),variation)).commit();                }
-            });
+                     ((FragmentActivity)context).getSupportFragmentManager().beginTransaction().addToBackStack("").replace(R.id.fragment, SelectedKlippekortFragment.newInstance(klippekort.get(position),variation)).commit();
+                }
+            });*/
 
 
             return viewRow;
