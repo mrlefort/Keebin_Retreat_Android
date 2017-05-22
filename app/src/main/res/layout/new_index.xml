@@ -5,6 +5,11 @@
               android:orientation="vertical">
 
 
+    <ListView
+        android:id="@+id/indexListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -27,11 +32,6 @@
             />
 
     </FrameLayout>
-
-    <ListView
-        android:id="@+id/indexListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
 
 
 </LinearLayout>

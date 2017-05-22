@@ -1,6 +1,7 @@
 package entity;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by kaspe on 2016-10-26.
@@ -8,47 +9,38 @@ import java.util.Date;
 
 public class Order
 {
-    private Date date;
-    private User user;
-    private CoffeeShop coffeeShop;
+    private int userId;
+    private int coffeeShopId;
     private String platform;
+    private List<OrderItem> orderedItemsList;
+    private int fullPriceKroner;
+    private int fullPriceØre;
 
-    public Order(Date date, User user, CoffeeShop coffeeShop, String platform)
+    public Order(int userId, int coffeeShop, String platform)
     {
-        this.date = date;
-        this.user = user;
-        this.coffeeShop = coffeeShop;
+        this.userId = userId;
+        this.coffeeShopId = coffeeShop;
         this.platform = platform;
     }
 
-    public Date getDate()
+    public int getUserId()
     {
-        return date;
+        return userId;
     }
 
-    public void setDate(Date date)
+    public void setUserId(int userId)
     {
-        this.date = date;
+        this.userId = userId;
     }
 
-    public User getUser()
+    public int getCoffeeShop()
     {
-        return user;
+        return coffeeShopId;
     }
 
-    public void setUser(User user)
+    public void setCoffeeShop(int coffeeShop)
     {
-        this.user = user;
-    }
-
-    public CoffeeShop getCoffeeShop()
-    {
-        return coffeeShop;
-    }
-
-    public void setCoffeeShop(CoffeeShop coffeeShop)
-    {
-        this.coffeeShop = coffeeShop;
+        this.coffeeShopId = coffeeShop;
     }
 
     public String getPlatform()
@@ -59,5 +51,45 @@ public class Order
     public void setPlatform(String platform)
     {
         this.platform = platform;
+    }
+
+    public List<OrderItem> getOrderedItemsList()
+    {
+        return orderedItemsList;
+    }
+
+    public void setOrderedItemsList(List<OrderItem> orderedItemsList)
+    {
+        this.orderedItemsList = orderedItemsList;
+    }
+
+    public int getCoffeeShopId()
+    {
+        return coffeeShopId;
+    }
+
+    public void setCoffeeShopId(int coffeeShopId)
+    {
+        this.coffeeShopId = coffeeShopId;
+    }
+
+    public int getFullPriceKroner()
+    {
+        return fullPriceKroner;
+    }
+
+    public void setFullPriceKroner(int fullPriceKroner)
+    {
+        this.fullPriceKroner = fullPriceKroner;
+    }
+
+    public int getFullPriceØre()
+    {
+        return fullPriceØre;
+    }
+
+    public void setFullPriceØre(int fullPriceØre)
+    {
+        this.fullPriceØre = fullPriceØre;
     }
 }

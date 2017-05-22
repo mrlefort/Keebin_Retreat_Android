@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,10 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -34,25 +37,13 @@ import rest.userReST.PutUser;
 public class YourInfoFragment extends Fragment implements AsyncResponse
 {
     private EditText newEmail;
-    private EditText newPw;
-    private EditText repeatPw;
     private EditText firstName;
     private EditText lastName;
-    private RadioButton isMale;
-    private RadioButton isFemale;
-    private String birthDay;
-    private EditText currentPw;
-    private RadioGroup radioGrp;
-
-
-    private static int mYear = 0;
-    private static int mMonth = 0;
-    private static int mDay = 0;
-    private User userToSave;
-    private Button saveButton;
-    private AsyncResponse delegatePoint;
-
-    private static Button picker;
+    private EditText newPassword;
+    private EditText repeatNewPassword;
+    private Button saveEditButton;
+    private EditText oldPassword;
+    private AsyncResponse delegate;
 
     public static YourInfoFragment newInstance()
     {
@@ -66,133 +57,46 @@ public class YourInfoFragment extends Fragment implements AsyncResponse
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         final View view = inflater.inflate(R.layout.edit_user, container, false);
-        delegatePoint = this;
 
-        final LinearLayout editPasswordLayout = (LinearLayout) view.findViewById(R.id.editPasswordLayout);
-        final LinearLayout editAboutMeLayout = (LinearLayout) view.findViewById(R.id.editAboutMeLayout);
-        final LinearLayout editEmailLayout = (LinearLayout) view.findViewById(R.id.editEmailLayout);
+        delegate = this;
+        newEmail = (EditText) view.findViewById(R.id.newEmail);
 
-        editPasswordLayout.setVisibility(View.GONE);
-        editAboutMeLayout.setVisibility(View.GONE);
-        editEmailLayout.setVisibility(View.GONE);
+        firstName = (EditText) view.findViewById(R.id.newFirstName);
+        lastName = (EditText) view.findViewById(R.id.newLastname);
 
-        Button editEmailButton = (Button) view.findViewById(R.id.editEmailButton);
-        Button editPasswordButton = (Button) view.findViewById(R.id.editPasswordButton);
-        Button editAboutMeButton = (Button) view.findViewById(R.id.editAboutMeButton);
+        newPassword = (EditText) view.findViewById(R.id.newPassword);
+        repeatNewPassword = (EditText) view.findViewById(R.id.repeatNewPassword);
+        oldPassword = (EditText) view.findViewById(R.id.oldPassword);
 
-        newEmail = (EditText) view.findViewById(R.id.emailEditField);
-        newPw = (EditText) view.findViewById(R.id.editKodeord);
-        repeatPw = (EditText) view.findViewById(R.id.editKodeordGentagelse);
-        firstName = (EditText) view.findViewById(R.id.editFirstName);
-        lastName = (EditText) view.findViewById(R.id.editLastName);
-        isMale = (RadioButton) view.findViewById(R.id.radio_male);
-        isFemale = (RadioButton) view.findViewById(R.id.radio_female);
-        currentPw = (EditText) view.findViewById(R.id.currentPwField);
-        radioGrp = (RadioGroup) view.findViewById(R.id.radioGrp);
-        currentPw = (EditText) view.findViewById(R.id.currentPwField);
+        newEmail.setHint(MainActivity.currentUser.getEmail());
+        firstName.setHint(MainActivity.currentUser.getFirstName());
+        lastName.setHint(MainActivity.currentUser.getLastName());
 
 
-        Button datePickerEdit = (Button) view.findViewById(R.id.datePickerEdit);
-        picker = datePickerEdit;
+        saveEditButton = (Button) view.findViewById(R.id.saveEditButton);
 
-
-        editEmailButton.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                if (editEmailLayout.getVisibility() == View.GONE)
-                {
-                    editEmailLayout.setVisibility(View.VISIBLE);
-                }
-                else
-                {
-                    editEmailLayout.setVisibility(View.GONE);
-                }
-            }
-        });
-
-        editPasswordButton.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                if (editPasswordLayout.getVisibility() == View.GONE)
-                {
-                    editPasswordLayout.setVisibility(View.VISIBLE);
-                }
-                else
-                {
-                    editPasswordLayout.setVisibility(View.GONE);
-                }
-            }
-        });
-
-        editAboutMeButton.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                if (editAboutMeLayout.getVisibility() == View.GONE)
-                {
-                    editAboutMeLayout.setVisibility(View.VISIBLE);
-                }
-                else
-                {
-                    editAboutMeLayout.setVisibility(View.GONE);
-                }
-            }
-        });
-
-        datePickerEdit.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                showDatePickerDialog(v);
-            }
-        });
-        saveButton = (Button) view.findViewById(R.id.saveEditButton);
-
-        saveButton.setOnClickListener(new View.OnClickListener()
+        saveEditButton.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v)
             {
                 Log.d("EDIT", "her er curUsr: " + MainActivity.currentUser.toString());
-                String day = mDay + "";
-                String month = mMonth + "";
-                birthDay = mYear + "-" + month + "-" + day + " 00:00:00";
-                if (day.length() == 1)
-                {
-                    day = "0" + day;
-                }
-                if (month.length() == 1)
-                {
-                    month = "0" + month;
-                }
-                if (mMonth == 0)
-                {
-                    birthDay = MainActivity.currentUser.getBirthday();
-                }
-                if (mDay == 0)
-                {
-                    birthDay = MainActivity.currentUser.getBirthday();
-                }
-                if (mYear == 0)
-                {
-                    birthDay = MainActivity.currentUser.getBirthday();
-                }
 
                 String forNavn;
                 if (firstName.getText().toString().equalsIgnoreCase(""))
                 {
-                    forNavn = MainActivity.currentUser.getFirstName();
+//                    forNavn = MainActivity.currentUser.getFirstName();
+                    forNavn = "";
                 }
                 else
                 {
                     forNavn = firstName.getText().toString();
                 }
 
-                String efterNavn;
+                String efterNavn = "";
                 if (lastName.getText().toString().equalsIgnoreCase(""))
                 {
-                    efterNavn = MainActivity.currentUser.getFirstName();
+//                    efterNavn = MainActivity.currentUser.getFirstName();
+                    forNavn = "";
                 }
                 else
                 {
@@ -203,41 +107,44 @@ public class YourInfoFragment extends Fragment implements AsyncResponse
                 String ePost;
                 if (newEmail.getText().toString().equalsIgnoreCase(""))
                 {
-                    ePost = MainActivity.currentUser.getEmail();
+//                    ePost = MainActivity.currentUser.getEmail();
+                    ePost = "";
                 }
+
                 else
                 {
                     ePost = newEmail.getText().toString();
                 }
 
-                String sex = MainActivity.currentUser.getSex();
-                if (radioGrp.getCheckedRadioButtonId() == isFemale.getId())
-                {
-                    sex = "Kvinde";
-                }
-                if (radioGrp.getCheckedRadioButtonId() == isMale.getId())
-                {
-                    sex = "Mand";
-                }
 
                 int roleId = 2;
 
                 String password;
-                if (newPw.getText().toString() != null && !newPw.getText().toString().equals("") && newPw.equals(repeatPw))
+                if (newPassword.getText().toString() != null && !newPassword.getText().toString().equals("") && newPassword.equals(repeatNewPassword))
                 {
-                    password = newPw.getText().toString();
+                    password = newPassword.getText().toString();
                 }
                 else
+
                 {
-                    password = currentPw.getText().toString();
+                    password = "";
+                }
+
+                String gamelPassword;
+                if (oldPassword.getText().toString() != null && !oldPassword.getText().toString().equals(""))
+                {
+                    gamelPassword = oldPassword.getText().toString();
+                }
+                else
+
+                {
+                    gamelPassword = "";
                 }
 
 
-//                Log.d("EDIT", "her er date: " + mMonth + mDay + mYear); 2010-09-08 18:00:00
-//                //(String firstName, String lastName, String email, String birthday, String sex, int roleId, String password)
-                userToSave = new User(forNavn,efterNavn,ePost,birthDay,sex,roleId,password);
-                Log.d("EDIT", "her er usrToSave: " + userToSave);
-                PutUser pu = new PutUser(currentPw.getText().toString(),userToSave, delegatePoint, getActivity(), getResources().getString(R.string.baseUrl), MainActivity.currentUser.getEmail());
+                User userToSave = new User(forNavn, efterNavn, ePost, "", "", 2, password);
+
+                PutUser pu = new PutUser(gamelPassword, userToSave, delegate, getActivity(), getResources().getString(R.string.baseUrl), MainActivity.currentUser.getEmail());
                 pu.execute();
             }
         });
@@ -250,7 +157,7 @@ public class YourInfoFragment extends Fragment implements AsyncResponse
     @Override
     public void processFinished(String output)
     {
-        Log.d("EDIT", "her er res: " +output);
+        Log.d("EDIT", "her er res: " + output);
         if (output.startsWith("Fejl:"))
         {
             Toast.makeText(getActivity(), output.substring(5), Toast.LENGTH_LONG).show();
@@ -259,50 +166,12 @@ public class YourInfoFragment extends Fragment implements AsyncResponse
         {
             Gson gson = new Gson();
             User user = gson.fromJson(output, User.class);
-            Log.d("EDIT", "ny usr: " +user.toString());
+            Log.d("EDIT", "ny usr: " + user.toString());
             Log.d("EDIT", "gammel usr: " + MainActivity.currentUser.toString());
             Toast.makeText(getActivity(), "Profil redigeret", Toast.LENGTH_LONG).show();
 //            MainActivity.currentUser = user;
         }
     }
 
-
-    public static void setDates(int year, int month, int day)
-    {
-        mYear = year;
-        mMonth = month;
-        mDay = day;
-        picker.setText(day + "/" + month + "/" + year);
-    }
-
-    public void showDatePickerDialog(View v)
-    {
-        DialogFragment newFragment = new DatePickerFragment();
-        newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
-    }
-
-    public static class DatePickerFragment extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener
-    {
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState)
-        {
-            // Use the current date as the default date in the picker
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-
-            // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), this, year, month, day);
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day)
-        {
-            setDates(year, month, day);
-
-        }
-    }
 
 }

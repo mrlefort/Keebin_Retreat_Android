@@ -32,14 +32,14 @@
 
 
         <!--<ImageButton-->
-        <!--android:id="@+id/Llama"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="left"-->
-        <!--android:background="@drawable/ic_more_vert_white_24dp"-->
-        <!--android:onClick="SettingsPopup"-->
+            <!--android:id="@+id/Llama"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="left"-->
+            <!--android:background="@drawable/ic_more_vert_white_24dp"-->
+            <!--android:onClick="SettingsPopup"-->
 
-        <!--/>-->
+            <!--/>-->
 
 
         <TextView
@@ -115,10 +115,10 @@
             </LinearLayout>
 
             <ImageButton
+                android:id="@+id/loyaltycards_menu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_loyalty_white_24dp"
-                android:id="@+id/loyaltycards_menu"
                 android:onClick="link_loyaltycards"
                 />
 
@@ -134,31 +134,31 @@
 
 
             <!--<LinearLayout-->
-                <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_weight="1"-->
-                <!--android:orientation="horizontal"-->
-                <!--&gt;-->
+            <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:orientation="horizontal"-->
+            <!--&gt;-->
             <!--</LinearLayout>-->
 
 
             <!--<ImageButton-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:background="@drawable/ic_search_white_24dp"-->
-                <!--android:id="@+id/search_menu"-->
-                <!--android:onClick="link_search"-->
-                <!--/>-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@drawable/ic_search_white_24dp"-->
+            <!--android:id="@+id/search_menu"-->
+            <!--android:onClick="link_search"-->
+            <!--/>-->
 
 
             <!--<LinearLayout-->
-                <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_weight="1"-->
-                <!--android:orientation="horizontal"-->
-                <!--&gt;-->
+            <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:orientation="horizontal"-->
+            <!--&gt;-->
             <!--</LinearLayout>-->
 
 
@@ -172,10 +172,10 @@
             </LinearLayout>
 
             <ImageButton
+                android:id="@+id/maps_menu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_place_white_24dp"
-                android:id="@+id/maps_menu"
                 android:onClick="link_maps"
 
                 />
@@ -211,13 +211,13 @@
             android:layout_width="65dp"
             android:layout_height="65dp"
             android:layout_gravity="bottom|right|end"
-            android:backgroundTint="#259797"
-            android:src="@drawable/add_coffee_button"
-            app:layout_anchorGravity="bottom|right|end"
             android:layout_margin="12dp"
+            android:backgroundTint="#259797"
             android:paddingRight="12dp"
-            app:fabSize="mini"
+            android:src="@drawable/add_coffee_button"
             app:borderWidth="0dp"
+            app:fabSize="mini"
+            app:layout_anchorGravity="bottom|right|end"
             />
 
 

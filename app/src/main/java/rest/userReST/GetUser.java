@@ -100,7 +100,7 @@ public class GetUser extends AsyncTask<String, Void, String>
     {
         try
         {
-            Log.d("GetUser", "vi kalder getUser()");
+            Log.d("GetUser", "vi kalder getUserId()");
             return getUser();
         } catch (IOException e)
         {
