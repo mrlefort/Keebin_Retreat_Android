@@ -209,25 +209,39 @@ public class DatabaseHandler extends SQLiteOpenHelper
     public void addBrandPicture(Bitmap bm, String brandName)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_BRANDNAME, brandName.toLowerCase());
-        values.put(KEY_IMAGEDATA, BitmapToByteConverter.getBytes(bm));
-        db.insert(TABLE_BRANDPICTURES, null, values);
-        db.close();
+        try
+        {
+            ContentValues values = new ContentValues();
+            values.put(KEY_BRANDNAME, brandName.toLowerCase());
+            values.put(KEY_IMAGEDATA, BitmapToByteConverter.getBytes(bm));
+            db.insert(TABLE_BRANDPICTURES, null, values);
+        }
+        finally
+        {
+            db.close();
+        }
+
     }
 
     public Bitmap getBrandPicture(String brandName)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-        brandName = brandName.toLowerCase();
-        Cursor cursor = db.query(TABLE_BRANDPICTURES, new String[]{KEY_BRANDNAME, KEY_IMAGEDATA}, KEY_BRANDNAME + "=?", new String[]{String.valueOf(brandName)}, null, null, null, null);
-        if (cursor != null)
+        try
         {
-            cursor.moveToPosition(0);
+            brandName = brandName.toLowerCase();
+            Cursor cursor = db.query(TABLE_BRANDPICTURES, new String[]{KEY_BRANDNAME, KEY_IMAGEDATA}, KEY_BRANDNAME + "=?", new String[]{String.valueOf(brandName)}, null, null, null, null);
+            if (cursor != null)
+            {
+                cursor.moveToPosition(0);
+            }
+            Bitmap bm = ByteArrayToBitmapConverter.getImage(cursor.getBlob(1));
+            return bm;
         }
-        Bitmap bm = ByteArrayToBitmapConverter.getImage(cursor.getBlob(1));
-        db.close();
-        return bm;
+        finally
+        {
+            db.close();
+        }
+
     }
 
     public int updateBrandPicture(Bitmap bm, String brandName)
@@ -252,42 +266,56 @@ public class DatabaseHandler extends SQLiteOpenHelper
     public void addLocation(UserLocation userLocation)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_USERID, 1);
-        values.put(KEY_LASTKNOWLOCATIONLAT, userLocation.getLat());
-        values.put(KEY_LASTKNOWLOCATIONLNG, userLocation.getLng());
+        try
+        {
+            ContentValues values = new ContentValues();
+            values.put(KEY_USERID, 1);
+            values.put(KEY_LASTKNOWLOCATIONLAT, userLocation.getLat());
+            values.put(KEY_LASTKNOWLOCATIONLNG, userLocation.getLng());
 
-        db.insertWithOnConflict(TABLE_LOCATION, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            db.insertWithOnConflict(TABLE_LOCATION, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
-        Log.d("DBH", "ADD LOC ER KALDT, loc=" + values.toString());
-        db.close();
+            Log.d("DBH", "ADD LOC ER KALDT, loc=" + values.toString());
+        }
+        finally
+        {
+            db.close();
+        }
+
     }
 
     public UserLocation getLocation(int userID)
     {
         Log.d("DBH", "Get loc; begynder getLocation from DB");
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_LOCATION, new String[]{KEY_USERID, KEY_LASTKNOWLOCATIONLAT, KEY_LASTKNOWLOCATIONLNG}, KEY_USERID + "=?", new String[]{String.valueOf(userID)}, null, null, null, null);
-        if (cursor != null)
-        {
-            cursor.moveToPosition(0);
-//            cursor.moveToFirst();
-        }
-        //input is (in order) userID, lat, lng
-        UserLocation userLocation;
-
         try
         {
-            userLocation = new UserLocation(cursor.getInt(0), cursor.getDouble(1), cursor.getDouble(2));
-        }
-        catch (CursorIndexOutOfBoundsException e)
-        {
-            userLocation = new UserLocation(0, 0);
-        }
+            Cursor cursor = db.query(TABLE_LOCATION, new String[]{KEY_USERID, KEY_LASTKNOWLOCATIONLAT, KEY_LASTKNOWLOCATIONLNG}, KEY_USERID + "=?", new String[]{String.valueOf(userID)}, null, null, null, null);
+            if (cursor != null)
+            {
+                cursor.moveToPosition(0);
+//            cursor.moveToFirst();
+            }
+            //input is (in order) userID, lat, lng
+            UserLocation userLocation;
 
-        db.close();
-        Log.d("DBH", "Get loc; Returnere location");
-        return userLocation;
+            try
+            {
+                userLocation = new UserLocation(cursor.getInt(0), cursor.getDouble(1), cursor.getDouble(2));
+            }
+            catch (CursorIndexOutOfBoundsException e)
+            {
+                userLocation = new UserLocation(0, 0);
+            }
+
+
+            Log.d("DBH", "Get loc; Returnere location");
+            return userLocation;
+        }
+        finally
+        {
+            db.close();
+        }
     }
 
     public int updateLocation(UserLocation userLocation)
@@ -315,51 +343,68 @@ public class DatabaseHandler extends SQLiteOpenHelper
     public void addCoffeeBrand(CoffeeBrand coffeeBrand)
     {
         SQLiteDatabase db = this.getWritableDatabase();
+        try
+        {
+            ContentValues values = new ContentValues();
+            values.put(KEY_DATABASEID, coffeeBrand.getId());
+            values.put(KEY_NAME, coffeeBrand.getBrandName()); // CoffeeBrand Name
+            values.put(KEY_NUMBEROFCOFFEENEEDED, coffeeBrand.getNumberOfCoffeeNeeded()); // CoffeeBrand coffees needed
 
-        ContentValues values = new ContentValues();
-        values.put(KEY_DATABASEID, coffeeBrand.getId());
-        values.put(KEY_NAME, coffeeBrand.getBrandName()); // CoffeeBrand Name
-        values.put(KEY_NUMBEROFCOFFEENEEDED, coffeeBrand.getNumberOfCoffeeNeeded()); // CoffeeBrand coffees needed
 
+            // Inserting Row
+            db.insert(TABLE_COFFEEBRAND, null, values);
+        }
+        finally
+        {
+            db.close(); // Closing database connection
+        }
 
-        // Inserting Row
-        db.insert(TABLE_COFFEEBRAND, null, values);
-
-        db.close(); // Closing database connection
     }
 
     // Getting single CoffeeBrand on client DB ID
     public CoffeeBrand getBrandbyId(int id)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_COFFEEBRAND, new String[]{KEY_ID, KEY_NAME, KEY_NUMBEROFCOFFEENEEDED, KEY_DATABASEID}, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
-        if (cursor != null)
+        try
         {
-            cursor.moveToFirst();
-        }
+            Cursor cursor = db.query(TABLE_COFFEEBRAND, new String[]{KEY_ID, KEY_NAME, KEY_NUMBEROFCOFFEENEEDED, KEY_DATABASEID}, KEY_ID + "=?", new String[]{String.valueOf(id)}, null, null, null, null);
+            if (cursor != null)
+            {
+                cursor.moveToFirst();
+            }
 
-        CoffeeBrand cb = new CoffeeBrand(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getInt(3));
-        db.close();
-        // return contact
-        return cb;
+            CoffeeBrand cb = new CoffeeBrand(cursor.getInt(0), cursor.getString(1), cursor.getInt(2), cursor.getInt(3));
+
+            // return contact
+            return cb;
+        }
+        finally
+        {
+            db.close();
+        }
     }
 
     // Getting single CoffeeBrand on Server DB ID
     public CoffeeBrand getBrandbyServerId(int brandName)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_COFFEEBRAND, new String[]{KEY_ID, KEY_NAME, KEY_NUMBEROFCOFFEENEEDED, KEY_DATABASEID}, KEY_DATABASEID + "=?", new String[]{String.valueOf(brandName)}, null, null, null, null);
-        if (cursor != null)
+        try
         {
-            cursor.moveToFirst();
-        }
+            Cursor cursor = db.query(TABLE_COFFEEBRAND, new String[]{KEY_ID, KEY_NAME, KEY_NUMBEROFCOFFEENEEDED, KEY_DATABASEID}, KEY_DATABASEID + "=?", new String[]{String.valueOf(brandName)}, null, null, null, null);
+            if (cursor != null)
+            {
+                cursor.moveToFirst();
+            }
 
-        CoffeeBrand cb = new CoffeeBrand(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getInt(2), cursor.getInt(3));
-        db.close();
-        // return contact
-        return cb;
+            CoffeeBrand cb = new CoffeeBrand(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getInt(2), cursor.getInt(3));
+
+            // return contact
+            return cb;
+        }
+        finally
+        {
+            db.close();
+        }
     }
 
     // Getting All CoffeeBrands
@@ -370,28 +415,35 @@ public class DatabaseHandler extends SQLiteOpenHelper
         String selectQuery = "SELECT  * FROM " + TABLE_COFFEEBRAND;
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst())
+        try
         {
-            do
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            // looping through all rows and adding to list
+            if (cursor.moveToFirst())
             {
-                CoffeeBrand cb = new CoffeeBrand();
-                cb.setId(Integer.parseInt(cursor.getString(0)));
-                cb.setBrandName(cursor.getString(1));
-                cb.setDataBaseId(Integer.parseInt(cursor.getString(2)));
-                cb.setNumberOfCoffeeNeeded(Integer.parseInt(cursor.getString(3)));
+                do
+                {
+                    CoffeeBrand cb = new CoffeeBrand();
+                    cb.setId(Integer.parseInt(cursor.getString(0)));
+                    cb.setBrandName(cursor.getString(1));
+                    cb.setDataBaseId(Integer.parseInt(cursor.getString(2)));
+                    cb.setNumberOfCoffeeNeeded(Integer.parseInt(cursor.getString(3)));
 
-                // Adding contact to list
-                coffeeBrandList.add(cb);
+                    // Adding contact to list
+                    coffeeBrandList.add(cb);
+                }
+                while (cursor.moveToNext());
             }
-            while (cursor.moveToNext());
-        }
 
-        // return contact list
-        db.close();
-        return coffeeBrandList;
+            // return contact list
+
+            return coffeeBrandList;
+        }
+        finally
+        {
+            db.close();
+        }
     }
 
 
@@ -401,8 +453,6 @@ public class DatabaseHandler extends SQLiteOpenHelper
         SQLiteDatabase db = this.getWritableDatabase();
         try
         {
-
-
             ContentValues values = new ContentValues();
             values.put(KEY_NAME, brandName);
             values.put(KEY_NUMBEROFCOFFEENEEDED, coffeesNeeded);
@@ -422,8 +472,15 @@ public class DatabaseHandler extends SQLiteOpenHelper
     public void deleteCoffeeBrandById(int brandId)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_COFFEEBRAND, KEY_ID + "=?", new String[]{String.valueOf(brandId)});
-        db.close();
+        try
+        {
+            db.delete(TABLE_COFFEEBRAND, KEY_ID + "=?", new String[]{String.valueOf(brandId)});
+        }
+        finally
+        {
+            db.close();
+        }
+
     }
 
 
@@ -432,32 +489,44 @@ public class DatabaseHandler extends SQLiteOpenHelper
     public void addToken(Token token)
     {
         SQLiteDatabase db = this.getWritableDatabase();
+        try
+        {
+            ContentValues values = new ContentValues();
+            values.put(KEY_TOKENNAME, token.getName());
+            values.put(KEY_TOKEN, token.getTokenData());
 
-        ContentValues values = new ContentValues();
-        values.put(KEY_TOKENNAME, token.getName());
-        values.put(KEY_TOKEN, token.getTokenData());
 
+            // Inserting Row
+            db.insert(TABLE_TOKENS, null, values);
+        }
+        finally
+        {
+            db.close(); // Closing database connection
+        }
 
-        // Inserting Row
-        db.insert(TABLE_TOKENS, null, values);
-        db.close(); // Closing database connection
     }
 
     // Getting single Token on client DB ID
     public Token getTokenByName(String name)
     {
         SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_TOKENS, new String[]{KEY_ID, KEY_TOKENNAME, KEY_TOKEN}, KEY_TOKENNAME + "=?", new String[]{name}, null, null, null, null);
-        if (cursor != null)
+        try
         {
-            cursor.moveToFirst();
-        }
+            Cursor cursor = db.query(TABLE_TOKENS, new String[]{KEY_ID, KEY_TOKENNAME, KEY_TOKEN}, KEY_TOKENNAME + "=?", new String[]{name}, null, null, null, null);
+            if (cursor != null)
+            {
+                cursor.moveToFirst();
+            }
 
-        Token t = new Token(cursor.getInt(0), cursor.getString(1), cursor.getString(2));
-        db.close();
-        // return contact
-        return t;
+            Token t = new Token(cursor.getInt(0), cursor.getString(1), cursor.getString(2));
+
+            // return contact
+            return t;
+        }
+        finally
+        {
+            db.close();
+        }
     }
 
 
@@ -469,27 +538,36 @@ public class DatabaseHandler extends SQLiteOpenHelper
         String selectQuery = "SELECT  * FROM " + TABLE_TOKENS;
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst())
+        try
         {
-            do
+
+
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            // looping through all rows and adding to list
+            if (cursor.moveToFirst())
             {
-                Token t = new Token();
-                t.setId(Integer.parseInt(cursor.getString(0)));
-                t.setName(cursor.getString(1));
-                t.setTokenData(cursor.getString(2));
+                do
+                {
+                    Token t = new Token();
+                    t.setId(Integer.parseInt(cursor.getString(0)));
+                    t.setName(cursor.getString(1));
+                    t.setTokenData(cursor.getString(2));
 
-                // Adding contact to list
-                tokenList.add(t);
+                    // Adding contact to list
+                    tokenList.add(t);
+                }
+                while (cursor.moveToNext());
             }
-            while (cursor.moveToNext());
-        }
 
-        // return contact list
-        db.close();
-        return tokenList;
+            // return contact list
+
+            return tokenList;
+        }
+        finally
+        {
+            db.close();
+        }
     }
 
 
@@ -517,64 +595,55 @@ public class DatabaseHandler extends SQLiteOpenHelper
     public void deleteToken(String tokenName)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_TOKENS, KEY_TOKENNAME + "=?", new String[]{tokenName});
-        db.close();
+        try
+        {
+            db.delete(TABLE_TOKENS, KEY_TOKENNAME + "=?", new String[]{tokenName});
+        }
+        finally
+        {
+            db.close();
+        }
+
     }
 
 
     public boolean hasObject(String id)
     {
         SQLiteDatabase db = getWritableDatabase();
-        String selectString = "SELECT * FROM " + TABLE_TOKENS + " WHERE " + KEY_TOKENNAME + " =?";
-        // Add the String you are searching by here.
-        // Put it in an array to avoid an unrecognized token error
-        Cursor cursor = db.rawQuery(selectString, new String[]{id});
-
-        boolean hasObject = false;
-        if (cursor.moveToFirst())
+        try
         {
-            hasObject = true;
+            String selectString = "SELECT * FROM " + TABLE_TOKENS + " WHERE " + KEY_TOKENNAME + " =?";
+            // Add the String you are searching by here.
+            // Put it in an array to avoid an unrecognized token error
+            Cursor cursor = db.rawQuery(selectString, new String[]{id});
 
-            //region if you had multiple records to check for, use this region.
-
-            int count = 0;
-            while (cursor.moveToNext())
+            boolean hasObject = false;
+            if (cursor.moveToFirst())
             {
-                count++;
-            }
-            //here, count is records found
-            //endregion
-        }
+                hasObject = true;
 
-        cursor.close();          // Dont forget to close your cursor
-        db.close();              //AND your Database!
-        return hasObject;
+                //region if you had multiple records to check for, use this region.
+
+                int count = 0;
+                while (cursor.moveToNext())
+                {
+                    count++;
+                }
+                //here, count is records found
+                //endregion
+            }
+
+            cursor.close();          // Dont forget to close your cursor
+            //AND your Database!
+            return hasObject;
+        }
+        finally
+        {
+            db.close();
+        }
 
 
     }
 
-//    public boolean isTableExists(String tableName, boolean openDb) {
-//        SQLiteDatabase db = getWritableDatabase();
-//        if(openDb) {
-//            if(db == null || !db.isOpen()) {
-//                db = getReadableDatabase();
-//            }
-//
-//            if(!db.isReadOnly()) {
-//                db.close();
-//                db = getReadableDatabase();
-//            }
-//        }
-//
-//        Cursor cursor = db.rawQuery("select DISTINCT " + TABLE_TOKENS +  " from KeebinDB  where " + TABLE_TOKENS + " = '"+TABLE_TOKENS+"'", null);
-//        if(cursor!=null) {
-//            if(cursor.getCount()>0) {
-//                cursor.close();
-//                return true;
-//            }
-//            cursor.close();
-//        }
-//        return false;
-//    }
 
 }
