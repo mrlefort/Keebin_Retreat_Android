@@ -36,7 +36,7 @@ public class NewIndex extends Fragment implements AsyncResponse
 
     private DatabaseHandler dbh;
     private List<CoffeeShop> coffeeList = new ArrayList<>();
-    ;
+
     private IndexAdapter adapter;
     private Gson gson = new Gson();
     EditText indexSearchBar;

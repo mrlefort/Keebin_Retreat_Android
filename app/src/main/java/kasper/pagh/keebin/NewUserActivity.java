@@ -11,6 +11,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -27,15 +29,15 @@ public class NewUserActivity extends AppCompatActivity implements AsyncResponse
 {
     private EditText editTextEmail;
     private EditText editTextPassword;
+    private EditText editRepeatPassword;
     private EditText editTextFirstname;
     private EditText editTextLastname;
     private TextView errorText;
-    private Spinner sex;
-    private Spinner birthday;
+    private RadioGroup radioGrp;
     private int mYear;
     private int mMonth;
     private int mDay;
-
+    private RadioButton selectedSex;
     private TextView mDateDisplay;
     private Button mPickDate;
 
@@ -56,16 +58,20 @@ public class NewUserActivity extends AppCompatActivity implements AsyncResponse
         editTextFirstname = (EditText) findViewById(R.id.newFirstName);
         editTextLastname = (EditText) findViewById(R.id.newLastname);
         editTextPassword = (EditText) findViewById(R.id.newPassword);
+        editRepeatPassword = (EditText) findViewById(R.id.repeatNewPassword);
         errorText = (TextView) findViewById(R.id.newUserError);
-        sex = (Spinner) findViewById(R.id.newSex);
+        radioGrp = (RadioGroup) findViewById(R.id.radioGrp);
+
+
+//        sex = (Spinner) findViewById(R.id.newSex);
 //        birthday = (Spinner) findViewById(R.id.newBirthDay);
-        String[] items = new String[]{"male", "female"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
+//        String[] items = new String[]{"male", "female"};
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
 //        String[] items2 = new String[]{"1994", "1995", "1996", "1997"};
 //        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items2);
-        sex.setAdapter(adapter);
+//        sex.setAdapter(adapter);
 //        birthday.setAdapter(adapter2);
-        mDateDisplay = (TextView) findViewById(R.id.showMyDate);
+//        mDateDisplay = (TextView) findViewById(R.id.showMyDate);
         mPickDate = (Button) findViewById(R.id.myDatePickerButton);
 
         mPickDate.setOnClickListener(new View.OnClickListener()
@@ -135,9 +141,12 @@ public class NewUserActivity extends AppCompatActivity implements AsyncResponse
     {
         if (isEmailValid(editTextEmail.getText() + ""))
         {
-            if (editTextPassword.getText() + "" != "")
+            if (!editTextPassword.getText().toString().equalsIgnoreCase("") && editTextPassword.getText().toString().equalsIgnoreCase(editRepeatPassword.getText().toString()))
             {
-                User userToSave = new User(editTextFirstname.getText() + "", editTextLastname.getText() + "", editTextEmail.getText() + "", mYear + "-" + mMonth + "-" + mDay + " 00:00:00", sex.getSelectedItem().toString(), 2, editTextPassword.getText() + "");
+                int radioId = radioGrp.getCheckedRadioButtonId();
+                selectedSex = (RadioButton) findViewById(radioId);
+                String sex = selectedSex.getText().toString();
+                User userToSave = new User(editTextFirstname.getText() + "", editTextLastname.getText() + "", editTextEmail.getText() + "", mYear + "-" + mMonth + "-" + mDay + " 00:00:00", sex, 2, editTextPassword.getText() + "");
                 NewUser newuser = new NewUser(getResources().getString(R.string.loginString), userToSave, this, getApplicationContext());
 
                 newuser.execute();

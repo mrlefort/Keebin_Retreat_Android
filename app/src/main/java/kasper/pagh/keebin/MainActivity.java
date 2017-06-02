@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,11 +30,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import DB.DatabaseHandler;
 import DB.GetBrandPicturesAndSaveToDB;
 import DB.GetCoffeeBrandsAndSaveToDB;
+import entity.OrderItem;
 import entity.UserLocation;
 import entity.User;
 import rest.NetworkChecker;
@@ -43,10 +46,9 @@ import utils.Loaders.CustomProgressbar;
 //All activities that deal with network MUST implement the AsyncResponse interface to get the data from the request. See: http://stackoverflow.com/questions/12575068/how-to-get-the-result-of-onpostexecute-to-main-activity-because-asynctask-is-a
 public class MainActivity extends AppCompatActivity implements AsyncResponse, ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, DBListener
 {
-
-    private static NetworkChecker networkChecker;
     private Gson gson = new Gson();
     public static User currentUser;
+    public static List<OrderItem> globalOrderList;
     FloatingActionButton fab;
     private DatabaseHandler dbh = new DatabaseHandler(this);
     private GoogleApiClient mGoogleApiClient;
@@ -63,10 +65,16 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse, Co
     DBListener dbListener = this;
 
 
+    public void resetOrder()
+    {
+        globalOrderList = new ArrayList<OrderItem>();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        globalOrderList = Collections.synchronizedList(new ArrayList<OrderItem>());
         setContentView(R.layout.activity_main);
         showLoadingDialog();
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -76,12 +84,12 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse, Co
             public void onClick(View v)
             {
                 fab.setEnabled(false);
-                getSupportFragmentManager().beginTransaction().addToBackStack("").replace(R.id.fragment, AddCoffeeToLoyaltycardFragment.newInstance()).commit();
+//                getSupportFragmentManager().beginTransaction().addToBackStack("").replace(R.id.fragment, AddCoffeeToLoyaltycardFragment.newInstance()).commit();
+//                getSupportFragmentManager().beginTransaction().addToBackStack("").replace(R.id.fragment, OrderFragment.newInstance()).commit();
                 fab.setEnabled(true);
             }
         });
 
-        networkChecker = new NetworkChecker(this);
         Intent intent = getIntent();
         String unparsedCurrentUser = intent.getStringExtra("unparsedCurrentUser");
         currentUser = gson.fromJson(unparsedCurrentUser, User.class);
@@ -366,8 +374,10 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse, Co
         ImageButton button = (ImageButton) findViewById(R.id.settingsBut);
         button.setEnabled(false);
         fab.setVisibility(View.INVISIBLE);
-        getSupportFragmentManager().beginTransaction().addToBackStack("").replace(R.id.fragment, KeebinInfoFragment.newInstance()).commit();
+//        getSupportFragmentManager().beginTransaction().addToBackStack("").replace(R.id.fragment, KeebinInfoFragment.newInstance()).commit();
+        getSupportFragmentManager().beginTransaction().addToBackStack("").replace(R.id.fragment, OrderFragment.newInstance()).commit();
         button.setEnabled(true);
+
     }
 
 

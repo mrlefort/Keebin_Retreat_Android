@@ -44,13 +44,23 @@ public class PutUser extends AsyncTask<String, Void, String>
     private String putUser() throws IOException
     {
         JsonObject jo = new JsonObject();
+
+        if(user.getPassword().equalsIgnoreCase(""))
+        {
+            jo.addProperty("firstName", user.getFirstName());
+            jo.addProperty("lastName", user.getLastName());
+            jo.addProperty("email", user.getEmail());
+            jo.addProperty("birthday", user.getBirthday());
+            jo.addProperty("sex", user.getSex());
+            jo.addProperty("oldpassword", oldPw);
+        }
         jo.addProperty("firstName", user.getFirstName());
         jo.addProperty("lastName", user.getLastName());
         jo.addProperty("email", user.getEmail());
         jo.addProperty("birthday", user.getBirthday());
         jo.addProperty("sex", user.getSex());
         jo.addProperty("oldpassword", oldPw);
-        jo.addProperty("password", user.getPassword());
+        jo.addProperty("password", "");
         jo.addProperty("role", 1);
         Log.d("PUTUSER", "her er JO: " + jo.toString());
 
