@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -65,7 +66,8 @@ public class LoginActivity extends AppCompatActivity implements AsyncResponse
             NetworkChecker nwc = new NetworkChecker(this);
             if (!nwc.networkChecker())
             {
-                errorText.setText("ingen forbindelse, tjek internet");
+//                errorText.setText("ingen forbindelse, tjek internet");
+                Toast.makeText(this, "Ingen forbindelse! Tjek om du har internet", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -96,11 +98,13 @@ public class LoginActivity extends AppCompatActivity implements AsyncResponse
 //            dismissLoadingDialog();
             if (output.substring(5).endsWith("senere"))
             {
-                errorText.setText(output);
+//                 errorText.setText(output);
+                Toast.makeText(this, "Fejl ved login. Prøv igen", Toast.LENGTH_LONG).show();
             }
             if (output.substring(5).endsWith("input"))
             {
-                errorText.setText("Forkert brugernavn eller password");
+//                errorText.setText("Forkert brugernavn eller password");
+                Toast.makeText(this, "Fejl ved login. Prøv igen", Toast.LENGTH_LONG).show();
             }
 
         }
